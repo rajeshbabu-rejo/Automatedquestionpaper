@@ -1,0 +1,64 @@
+function Initialize() {
+  
+var triggers = ScriptApp.getScriptTriggers();
+  
+  for (var i in triggers) {
+    ScriptApp.deleteTrigger(triggers[i]);
+}
+
+ScriptApp.newTrigger("rejo")
+.forSpreadsheet(SpreadsheetApp.getActiveSpreadsheet())
+.onFormSubmit()
+.create();
+
+}
+
+// Edit Line Nos 22,23,56,57
+function rejo(e) {
+  Logger.log('value of e is: ' + e);
+  try {
+    var ss,cc,sendername,subject;
+    var message,value,textbody,sender;
+    const googleDocTemplate = DriveApp.getFileById("10M5Q7ZSnkSj8xFIBlS76OOmH5j7CNleq1a3nsvPqrJw");
+    const DestinationFolder = DriveApp.getFolderById("1fVJ9A5kX3mVa3aVsWs5J5zqJ7PYluAJw")
+    cc = Session.getActiveUser().getEmail();
+    
+    ss=SpreadsheetApp.getActiveSpreadsheet();
+    SpreadsheetApp.setActiveSheet(ss.getSheets()[0]);
+    sender = e.namedValues["Email ID"].toString();
+    var nam = e.namedValues["Name"].toString();
+    var reg = e.namedValues["Register Number"].toString();
+    var rejoset = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("QuestionSet");
+    var rejosetvalue = rejoset.getRange(1,1,11,11).getValues();
+
+      const copy = googleDocTemplate.makeCopy(reg, DestinationFolder);
+      const doc = DocumentApp.openById(copy.getId());
+      const docbody = doc.getBody();
+      
+            docbody.replaceText('{{First}}', rejosetvalue[1][1]);
+            docbody.replaceText('{{Second}}', rejosetvalue[2][1]);
+            docbody.replaceText('{{Third}}', rejosetvalue[3][1]);
+            docbody.replaceText('{{Fourth}}', rejosetvalue[4][1]);
+            docbody.replaceText('{{Fifth}}', rejosetvalue[5][1]);
+            docbody.replaceText('{{Sixth}}', rejosetvalue[6][1]);
+            docbody.replaceText('{{Seventh}}', rejosetvalue[7][1]);
+            docbody.replaceText('{{Eighth}}', rejosetvalue[8][1]);
+            docbody.replaceText('{{Ninth}}', rejosetvalue[9][1]);
+            docbody.replaceText('{{Tenth}}', rejosetvalue[10][1]);
+      
+      doc.saveAndClose();
+      const url = doc.getUrl();
+    message = "<html><body>Dear Student <br>:"+nam;
+    message+="<br><br><h3>Click on the Drive link for Question</h3>";
+    message+="<p><h4>"+url+"</h4></p>";
+    message+="<p>Submit the Answer Sheet in GCR<br></p></body></html>";
+    
+    sendername = "C. Rajesh Babu"
+    subject = "SRMIST Cyce Test III Question Paper"
+    GmailApp.sendEmail(sender, subject, message, {name: sendername, htmlBody:message});
+
+  }
+  catch (e) {
+    Logger.log(e.toString());
+  }
+}
